@@ -1,8 +1,8 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
-int trialCount = 10; //this will be set higher for the bakeoff
-final float screenPPI = 126; //what is the Pixels Per Inch of the screen you are using 
+int trialCount = 30; //this will be set higher for the bakeoff
+final float screenPPI = 127; //what is the Pixels Per Inch of the screen you are using 
 
 //these are variables you should probably leave alone
 int index = 0; //starts at zero-ith trial
@@ -17,11 +17,22 @@ boolean userDone = false; //is the user done
 //These variables are for my example design. Your input code should modify/replace these!
 float logoX = 500; //global variable for the X position of the logo
 float logoY = 500; //global variable for the Y position of the logo
-float logoS = 50f; //global variable for the Size position of the logo
+float logoS = 1f; //global variable for the Size position of the logo
 float logoR = 0; //global variable for the Rotation position of the logo
 
 PFont smallFont;
 PFont largeFont;
+
+int resizeFlag = 0;
+
+float xOffset = (float) (0.5* logoS * Math.sqrt(2) * Math.sin(radians(45+logoR)));
+float yOffset = (float) (0.5* logoS * Math.sqrt(2) * Math.cos(radians(45+logoR)));
+
+float c1X = 0;
+float c1Y = 0;
+float smallRadius = 15;
+//float c2X = 0;
+//float c2Y = 0;
 
 private class Destination
 {
@@ -34,6 +45,8 @@ private class Destination
 ArrayList<Destination> destinations = new ArrayList<Destination>();
 
 void setup() {
+  noCursor();
+  fullScreen();
   size(1200, 800);
   rectMode(CENTER);
   largeFont = createFont("Arial", inchToPix(.3f)); //sets the font to Arial that is 0.3" tall
@@ -61,12 +74,19 @@ void setup() {
 }
 
 void draw() {
-  background(40); //background is dark grey. Can't change this.
+  noCursor();
+  background(40); //background is dark grey
   noStroke();
+  //fill(255,0,0);
+  //rect(width/2,height/2, inchToPix(1f), inchToPix(1f));
   
-  //next two lines are just for testing if your PPI is set correctly. It should be 1x1" on your screen if correct. This can be removed for the Bakeoff.
-  fill(200,200,200);
-  rect(width/2,height/2, inchToPix(1f), inchToPix(1f)); 
+  
+  //background(40); //background is dark grey. Can't change this.
+  //noStroke();
+  
+  ////next two lines are just for testing if your PPI is set correctly. It should be 1x1" on your screen if correct. This can be removed for the Bakeoff.
+  //fill(200,200,200);
+  //rect(width/2,height/2, inchToPix(1f), inchToPix(1f)); 
   
   fill(200);
   textFont(largeFont);
@@ -99,15 +119,20 @@ void draw() {
 
   //===========DRAW LOGO SQUARE=================
   pushMatrix();
-  translate(logoX, logoY); //translate draw center to the center oft he logo square
+  translate(logoX, logoY); //translate draw center to the center of the logo square
   rotate(radians(logoR)); //rotate using the logo square as the origin
-  noStroke();
-  fill(60, 60, 192, 192);
+  //noStroke();
+  stroke(1);
+  fill(60, 60, 192, 0);
   rect(0, 0, logoS, logoS);
+  
   fill(255);
   textFont(smallFont);
-  text("LOGO",0,0);
+  //text("LOGO",0,0);
   popMatrix();
+  noStroke();
+  circle(c1X,c1Y,smallRadius);
+  circle(mouseX,mouseY,smallRadius);
 
   //===========DRAW EXAMPLE CONTROLS=================
   fill(255);
@@ -116,61 +141,107 @@ void draw() {
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
 }
 
+
+
 //my example design for control, which is a terrible design
 void scaffoldControlLogic()
 {
+  
+  
+  if (mousePressed){
+    float dist = dist(mouseX, mouseY, c1X, c1Y);
+    logoS = dist / sqrt(2);
+    logoR = degrees((float) Math.atan2(mouseY - c1Y,mouseX - c1X))+45;
+    logoX = (mouseX + c1X)/2;
+    logoY = (mouseY + c1Y)/2;
+  
+  }
+  else{
+    float angleRad = radians(logoR - 45);
+    float halfDiag = (logoS * sqrt(2)) / 2;
+    xOffset = halfDiag * cos(angleRad);
+    yOffset = halfDiag * sin(angleRad);
+    logoX = mouseX - xOffset;
+    logoY = mouseY - yOffset;
+    c1X = logoX - xOffset;
+    c1Y = logoY - yOffset;
+  }
+  
+  
+  
+  //text(String.format("%.2f, %.2f, %.2f", logoS, logoX, logoY), 300,300);
+  //text(String.format("%.2f, %.2f, %.2f", logoS, xOffset, yOffset), 300,100);
   //upper left corner, rotate counterclockwise
-  text("CCW", inchToPix(.4f), inchToPix(.4f));
-  if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
-    logoR--;
+  //text("CCW", inchToPix(.4f), inchToPix(.4f));
+  //if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
+  //  logoR--;
 
   //upper right corner, rotate clockwise
-  text("CW", width-inchToPix(.4f), inchToPix(.4f));
-  if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
-    logoR++;
+  //text("CW", width-inchToPix(.4f), inchToPix(.4f));
+  //if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
+  //  logoR++;
 
-  //lower left corner, decrease Z
-  text("-", inchToPix(.4f), height-inchToPix(.4f));
-  if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
-    logoS = constrain(logoS-inchToPix(.02f), inchToPix(0.25f), inchToPix(4f)); //leave min and max alone!
+  ////lower left corner, decrease Z
+  //text("-", inchToPix(.4f), height-inchToPix(.4f));
+  //if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
+  //  logoS = constrain(logoS-inchToPix(.02f), inchToPix(0.25f), inchToPix(4f)); //leave min and max alone!
 
-  //lower right corner, increase Z
-  text("+", width-inchToPix(.4f), height-inchToPix(.4f));
-  if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
-    logoS = constrain(logoS+inchToPix(.02f), inchToPix(0.25f), inchToPix(4f)); //leave min and max alone! 
+  ////lower right corner, increase Z
+  //text("+", width-inchToPix(.4f), height-inchToPix(.4f));
+  //if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
+  //  logoS = constrain(logoS+inchToPix(.02f), inchToPix(0.25f), inchToPix(4f)); //leave min and max alone! 
 
-  //left middle, move left
-  text("left", inchToPix(.4f), height/2);
-  if (mousePressed && dist(0, height/2, mouseX, mouseY)<inchToPix(.8f))
-    logoX-=inchToPix(.02f);
+  ////left middle, move left
+  //text("left", inchToPix(.4f), height/2);
+  //if (mousePressed && dist(0, height/2, mouseX, mouseY)<inchToPix(.8f))
+  //  logoX-=inchToPix(.02f);
 
-  text("right", width-inchToPix(.4f), height/2);
-  if (mousePressed && dist(width, height/2, mouseX, mouseY)<inchToPix(.8f))
-    logoX+=inchToPix(.02f);
+  //text("right", width-inchToPix(.4f), height/2);
+  //if (mousePressed && dist(width, height/2, mouseX, mouseY)<inchToPix(.8f))
+  //  logoX+=inchToPix(.02f);
 
-  text("up", width/2, inchToPix(.4f));
-  if (mousePressed && dist(width/2, 0, mouseX, mouseY)<inchToPix(.8f))
-    logoY-=inchToPix(.02f);
+  //text("up", width/2, inchToPix(.4f));
+  //if (mousePressed && dist(width/2, 0, mouseX, mouseY)<inchToPix(.8f))
+  //  logoY-=inchToPix(.02f);
 
-  text("down", width/2, height-inchToPix(.4f));
-  if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchToPix(.8f))
-    logoY+=inchToPix(.02f);
+  //text("down", width/2, height-inchToPix(.4f));
+  //if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchToPix(.8f))
+  //  logoY+=inchToPix(.02f);
 }
 
-void mousePressed()
+void mouseClicked()
 {
-  if (startTime == 0) //start time on the instant of the first user click
+  
+  
+  if(mouseButton == RIGHT)
   {
-    startTime = millis();
-    println("time started!");
+    //println("right click");
+    //if (startTime == 0) //start time on the instant of the first user click
+    //{
+    //  startTime = millis();
+    //  println("time started!");
+    //}
+    //check();
+    
   }
 }
 
-void mouseReleased()
+void mouseReleased(){
+  
+  println("right click");
+   if (startTime == 0) //start time on the instant of the first user click
+   {
+     startTime = millis();
+     println("time started!");
+   }
+   check();
+}
+
+void check()
 {
   //check to see if user clicked middle of screen within 1 inches, which this code uses as a submit button. This is a terrible design you should probably replace.
-  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(1f))
-  {
+  //if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(1f))
+  //{
     if (userDone==false && !checkForSuccess())
       errorCount++;
 
@@ -181,16 +252,25 @@ void mouseReleased()
       userDone = true;
       finishTime = millis();
     }
-  }
+    logoS = 0;
+  //}
 }
+
+//double calculateOffset(){
+//  double xOffset = 0.5* logoS * Math.sqrt(2) * Math.sin(45+logoR);
+//  double yOffset = 0.5* logoS * Math.sqrt(2) * Math.cos(45+logoR);
+//  return xOffset, yOffset;
+//}
+
+
 
 //probably shouldn't modify this, but email me if you want to for some good reason.
 public boolean checkForSuccess()
 {
-  Destination d = destinations.get(trialIndex);	
+  Destination d = destinations.get(trialIndex);  
   boolean closeDist = dist(d.x, d.y, logoX, logoY)<inchToPix(.05f); //has to be within +-0.05"
   boolean closeRotation = calculateDifferenceBetweenAngles(d.r, logoR)<=5;
-  boolean closeSize = abs(d.s - logoS)<inchToPix(.1f); //has to be within +-0.1"	
+  boolean closeSize = abs(d.s - logoS)<inchToPix(.1f); //has to be within +-0.1"  
 
   println("Close Enough Distance: " + closeDist + " (logo X/Y = " + d.x + "/" + d.y + ", destination X/Y = " + logoX + "/" + logoY +")");
   println("Close Enough Rotation: " + closeRotation + " (rot dist="+calculateDifferenceBetweenAngles(d.r, logoR)+")");
