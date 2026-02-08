@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
-int trialCount = 30; //this will be set higher for the bakeoff
+int trialCount = 10; //this will be set higher for the bakeoff
 final float screenPPI = 127; //what is the Pixels Per Inch of the screen you are using 
 
 //these are variables you should probably leave alone
