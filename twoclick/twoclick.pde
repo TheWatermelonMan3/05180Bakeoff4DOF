@@ -21,7 +21,7 @@ float logoS = 1f; //global variable for the Size position of the logo
 float logoR = 0; //global variable for the Rotation position of the logo
 //float logoZ = 0;
 
-
+int success = 0;
 
 PFont smallFont;
 PFont largeFont;
@@ -31,11 +31,12 @@ int resizeFlag = 0;
 float xOffset = (float) (0.5* logoS * Math.sqrt(2) * Math.sin(radians(45+logoR)));
 float yOffset = (float) (0.5* logoS * Math.sqrt(2) * Math.cos(radians(45+logoR)));
 
-float c1X = 0;
-float c1Y = 0;
+float c1X = -1;
+float c1Y = -1;
 float smallRadius = 15;
-//float c2X = 0;
-//float c2Y = 0;
+float c2X = -1;
+float c2Y = -1;
+
 
 private class Destination
 {
@@ -80,6 +81,7 @@ void draw() {
   noCursor();
   background(40); //background is dark grey
   noStroke();
+  
   //fill(255,0,0);
   //rect(width/2,height/2, inchToPix(1f), inchToPix(1f));
   
@@ -90,7 +92,7 @@ void draw() {
   ////next two lines are just for testing if your PPI is set correctly. It should be 1x1" on your screen if correct. This can be removed for the Bakeoff.
   //fill(200,200,200);
   //rect(width/2,height/2, inchToPix(1f), inchToPix(1f)); 
-  
+  scaffoldControlLogic(); //you are going to want to replace this!
   fill(200);
   textFont(largeFont);
   //shouldn't really modify this printout code unless there is a really good reason to
@@ -119,31 +121,81 @@ void draw() {
     rect(0, 0, d.s, d.s);
     popMatrix();
   }
-
-  //===========DRAW LOGO SQUARE=================
-  pushMatrix();
-  translate(logoX, logoY); //translate draw center to the center of the logo square
-  rotate(radians(logoR)); //rotate using the logo square as the origin
-  //noStroke();
-  fill(60, 60, 192, 0);
-  if (logoS >= inchToPix(0.25)) stroke(100, 255, 0);
-  else stroke(255, 100, 0);
-  rect(0, 0, logoS, logoS);
-  
-  if (!mousePressed || logoS >= inchToPix(0.25)) fill(255);
-  else fill(255, 100, 0);
-  textFont(smallFont);
-  //text("LOGO",0,0);
-  popMatrix();
-  noStroke();
-  circle(c1X,c1Y,smallRadius);
+  if(logoS > 0){
+    //===========DRAW LOGO SQUARE=================
+    pushMatrix();
+    translate(logoX, logoY); //translate draw center to the center of the logo square
+    rotate(radians(logoR)); //rotate using the logo square as the origin
+    //noStroke();
+    fill(60, 60, 192, 0);
+    
+    
+    
+    //if (logoS >= inchToPix(0.25)) stroke(100, 255, 0);
+    //else stroke(255, 100, 0);
+    
+    
+    if(success == 1){
+      fill(0, 255, 0,150);
+      stroke(0,255,0);
+    }else if (success == -1){
+      stroke(255,0,0);
+      fill(255, 0, 0,150);
+    }else{
+      stroke(255);
+      fill(255);
+    }
+    rect(0, 0, logoS, logoS);
+    
+    //if (!mousePressed || logoS >= inchToPix(0.25)) fill(255);
+    //else fill(255, 100, 0);
+    
+    
+    textFont(smallFont);
+    //text("LOGO",0,0);
+    popMatrix();
+  }
+  fill(255, 255, 255);
+  //circle(c1X,c1Y,smallRadius);
   circle(mouseX,mouseY,smallRadius);
 
   //===========DRAW EXAMPLE CONTROLS=================
   fill(255);
   textFont(largeFont);
-  scaffoldControlLogic(); //you are going to want to replace this!
+  
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
+  fill(0,0,0);
+  
+  
+  
+  if(c1X > 0 && c1Y > 0){
+    fill(255);
+    circle(c1X,c1Y,smallRadius+3);
+    fill(0,0,0);
+    text("1",c1X,c1Y);
+  }
+  
+  if(c2X > 0 && c2Y > 0){
+    fill(255);
+    circle(c2X,c2Y,smallRadius+3);
+    fill(0,0,0);
+    text("2",c2X,c2Y);
+  }
+  
+    if(success == 1){
+      fill(0,255,0);
+      //text("Correct!!!",width/2 + 200,100);
+      //text("Correct!!!",width/2,900);
+      
+      text("Correct!!!",mouseX+100,mouseY - 20);
+    }else if(success == -1){
+      fill(255,0,0);
+      //text("Incorrect!!!",width/2 + 200,100);
+      //text("Incorrect!!!",width/2,900);
+      text("Incorrect!!!",mouseX+100,mouseY - 20);
+    }
+  
+  
 }
 
 
@@ -153,23 +205,40 @@ void scaffoldControlLogic()
 {
   
   
-  if (mousePressed){
-    float dist = dist(mouseX, mouseY, c1X, c1Y);
-    logoS = dist / sqrt(2);
-    logoR = degrees((float) Math.atan2(mouseY - c1Y,mouseX - c1X))+45;
-    logoX = (mouseX + c1X)/2;
-    logoY = (mouseY + c1Y)/2;
+  //if (mousePressed){
+  //  float dist = dist(mouseX, mouseY, c1X, c1Y);
+  //  logoS = dist / sqrt(2);
+  //  logoR = degrees((float) Math.atan2(mouseY - c1Y,mouseX - c1X))+45;
+  //  logoX = (mouseX + c1X)/2;
+  //  logoY = (mouseY + c1Y)/2;
   
-  }
-  else{
-    float angleRad = radians(logoR - 45);
-    float halfDiag = (logoS * sqrt(2)) / 2;
-    xOffset = halfDiag * cos(angleRad);
-    yOffset = halfDiag * sin(angleRad);
-    logoX = mouseX - xOffset;
-    logoY = mouseY - yOffset;
-    c1X = logoX - xOffset;
-    c1Y = logoY - yOffset;
+  //}
+  //else{
+  //  float angleRad = radians(logoR - 45);
+  //  float halfDiag = (logoS * sqrt(2)) / 2;
+  //  xOffset = halfDiag * cos(angleRad);
+  //  yOffset = halfDiag * sin(angleRad);
+  //  logoX = mouseX - xOffset;
+  //  logoY = mouseY - yOffset;
+  //  c1X = logoX - xOffset;
+  //  c1Y = logoY - yOffset;
+  //}
+  
+  if(c1X>0 && c1Y>0 && c2X>0 && c2Y>0){
+    float dist = dist(c1X, c1Y, c2X, c2Y);
+    logoS = dist / sqrt(2);
+    logoR = degrees((float) Math.atan2(c2Y - c1Y,c2X - c1X))+45;
+    logoX = (c2X + c1X)/2;
+    logoY = (c2Y + c1Y)/2;
+    if(checkForSuccess()){
+      success = 1;
+    }else{
+      success = -1;
+    }
+    
+  }else{
+    success = 0;
+    logoS = 0;
   }
   
   
@@ -214,12 +283,61 @@ void scaffoldControlLogic()
   //  logoY+=inchToPix(.02f);
 }
 
-void mouseClicked()
+void mousePressed()
 {
   
   
+  if(mouseButton == LEFT)
+  {
+    
+    if(c1X < 0 && c1Y < 0){
+      c1X = mouseX;
+      c1Y = mouseY;
+    }
+    
+    else if(c2X < 0 && c2Y < 0){
+      c2X = mouseX;
+      c2Y = mouseY;
+    }
+    
+    else{
+      println("submitted");
+      c1X = -1;
+      c1Y = -1;
+      c2X = -1;
+      c2Y = -1;
+      if (startTime == 0) //start time on the instant of the first user click
+      {
+        startTime = millis();
+        println("time started!");
+      }
+      check();
+      success = 0;
+    }
+    
+    //println("right click");
+    //if (startTime == 0) //start time on the instant of the first user click
+    //{
+    //  startTime = millis();
+    //  println("time started!");
+    //}
+    //check();
+    
+  }
   if(mouseButton == RIGHT)
   {
+    
+    if(c2X > 0 && c2Y > 0){
+      c2X = -1;
+      c2Y = -1;
+      success = 0;
+    }
+    
+    else if(c1X > 0 && c1Y > 0){
+      c1X = -1;
+      c1Y = -1;
+    }
+    
     //println("right click");
     //if (startTime == 0) //start time on the instant of the first user click
     //{
@@ -233,19 +351,19 @@ void mouseClicked()
 
 void mouseReleased(){
   
-  println("right click");
-   if (startTime == 0) //start time on the instant of the first user click
-   {
-     startTime = millis();
-     println("time started!");
-   }
-   if (logoS >= inchToPix(0.25)) check();
-   else {
-     logoS = 0.0;
-     logoR = 0.0;
-     logoX = mouseX;
-     logoY = mouseY;
-   }
+   //println("right click");
+   //if (startTime == 0) //start time on the instant of the first user click
+   //{
+   //  startTime = millis();
+   //  println("time started!");
+   //}
+   //if (logoS >= inchToPix(0.25)) check();
+   //else {
+   //  logoS = 0.0;
+   //  logoR = 0.0;
+   //  logoX = mouseX;
+   //  logoY = mouseY;
+   //}
 }
 
 void check()
