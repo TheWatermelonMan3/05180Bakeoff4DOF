@@ -224,6 +224,8 @@ void scaffoldControlLogic()
   //  c1Y = logoY - yOffset;
   //}
   
+  
+  
   if(c1X>0 && c1Y>0 && c2X>0 && c2Y>0){
     float dist = dist(c1X, c1Y, c2X, c2Y);
     logoS = dist / sqrt(2);
@@ -236,6 +238,21 @@ void scaffoldControlLogic()
       success = -1;
     }
     
+  }else if(c1X >0 && c1Y>0){
+    //success = 0;
+    //logoS = 0;
+    
+    
+    float dist = dist(c1X, c1Y, mouseX, mouseY);
+    logoS = dist / sqrt(2);
+    logoR = degrees((float) Math.atan2(mouseY - c1Y,mouseX - c1X))+45;
+    logoX = (mouseX + c1X)/2;
+    logoY = (mouseY + c1Y)/2;
+    if(checkForSuccess()){
+      success = 1;
+    }else{
+      success = -1;
+    }
   }else{
     success = 0;
     logoS = 0;
@@ -295,10 +312,10 @@ void mousePressed()
       c1Y = mouseY;
     }
     
-    else if(c2X < 0 && c2Y < 0){
-      c2X = mouseX;
-      c2Y = mouseY;
-    }
+    //else if(c2X < 0 && c2Y < 0){
+    //  c2X = mouseX;
+    //  c2Y = mouseY;
+    //}
     
     else{
       println("submitted");
@@ -327,13 +344,13 @@ void mousePressed()
   if(mouseButton == RIGHT)
   {
     
-    if(c2X > 0 && c2Y > 0){
-      c2X = -1;
-      c2Y = -1;
-      success = 0;
-    }
+    //if(c2X > 0 && c2Y > 0){
+    //  c2X = -1;
+    //  c2Y = -1;
+    //  success = 0;
+    //}
     
-    else if(c1X > 0 && c1Y > 0){
+    if(c1X > 0 && c1Y > 0){
       c1X = -1;
       c1Y = -1;
     }
