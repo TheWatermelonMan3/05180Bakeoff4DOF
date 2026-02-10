@@ -33,9 +33,12 @@ float yOffset = (float) (0.5* logoS * Math.sqrt(2) * Math.cos(radians(45+logoR))
 
 float c1X = -1;
 float c1Y = -1;
-float smallRadius = 15;
+float smallRadius = 13;
 float c2X = -1;
 float c2Y = -1;
+
+int offX = 100;
+int offY = 100;
 
 
 private class Destination
@@ -51,7 +54,7 @@ ArrayList<Destination> destinations = new ArrayList<Destination>();
 void setup() {
   noCursor();
   fullScreen();
-  size(1200, 800);
+  //size(1200, 800);
   rectMode(CENTER);
   largeFont = createFont("Arial", inchToPix(.3f)); //sets the font to Arial that is 0.3" tall
   smallFont = createFont("Arial", inchToPix(.1f)); //sets the font to Arial that is 0.3" tall
@@ -66,8 +69,8 @@ void setup() {
   for (int i=0; i<trialCount; i++) 
   {
     Destination d = new Destination();
-    d.x = random(windowPadding, width-windowPadding); //set a random x with some padding
-    d.y = random(windowPadding, height-windowPadding); //set a random y with some padding
+    d.x = random(offX + windowPadding, offX + 1200-windowPadding); //set a random x with some padding
+    d.y = random(offY + windowPadding, offY + 800-windowPadding); //set a random y with some padding
     d.r = random(0, 360); //random rotation between 0 and 360
     d.s = inchToPix((float)random(1,12)/4.0f); //increasing size from 0.25" up to 3.0" 
     destinations.add(d);
@@ -163,7 +166,7 @@ void draw() {
   fill(255);
   textFont(largeFont);
   
-  text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
+  text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.6f));
   fill(0,0,0);
   
   
