@@ -175,14 +175,14 @@ void draw() {
     fill(255);
     circle(c1X,c1Y,smallRadius+3);
     fill(0,0,0);
-    text("1",c1X,c1Y);
+    //text("1",c1X,c1Y);
   }
   
   if(c2X > 0 && c2Y > 0){
     fill(255);
     circle(c2X,c2Y,smallRadius+3);
     fill(0,0,0);
-    text("2",c2X,c2Y);
+    //text("2",c2X,c2Y);
   }
   
     if(success == 1){
